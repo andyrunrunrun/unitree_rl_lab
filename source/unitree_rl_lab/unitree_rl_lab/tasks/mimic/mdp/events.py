@@ -11,6 +11,17 @@ from isaaclab.managers import SceneEntityCfg
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
 
+"""Mimic（动作模仿）任务的事件/域随机化函数。
+
+这些函数通常在 env_cfg 的 `EventCfg` 中以 `EventTerm(func=..., mode=..., params=...)` 使用。
+
+为什么 Mimic 特别需要这些随机化？
+- **关节零位（default_joint_pos）偏差**：真机标定误差是常态，零位偏差会显著影响跟踪质量；
+- **质心（CoM）偏移**：背包、电池、手持物体等会改变身体动力学；
+
+这些扰动在仿真训练中加入后，得到的策略更容易迁移到真机（sim2real）。
+"""
+
 
 def randomize_joint_default_pos(
     env: ManagerBasedEnv,
@@ -20,8 +31,14 @@ def randomize_joint_default_pos(
     operation: Literal["add", "scale", "abs"] = "abs",
     distribution: Literal["uniform", "log_uniform", "gaussian"] = "uniform",
 ):
-    """
-    Randomize the joint default positions which may be different from URDF due to calibration errors.
+    """随机化关节默认零位（default_joint_pos）。
+
+    直觉：URDF 里的“理论零位”与真机经过标定后的“实际零位”往往不一致。
+    训练时对 default_joint_pos 注入小范围扰动，可以让策略对零位误差更鲁棒。
+
+    关键点：
+    - 同时更新 action term 的 offset（`JointPositionAction._offset`），否则“动作=偏移+offset”的含义会错位。
+    - 这里把 nominal 值保存到 `default_joint_pos_nominal`，便于之后导出/复现。
     """
     # extract the used quantities (to enable type-hinting)
     asset: Articulation = env.scene[asset_cfg.name]

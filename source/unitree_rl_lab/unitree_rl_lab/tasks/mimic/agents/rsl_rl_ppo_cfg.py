@@ -9,6 +9,21 @@ from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, R
 
 @configclass
 class BasePPORunnerCfg(RslRlOnPolicyRunnerCfg):
+    """Mimic 任务使用的 RSL-RL PPO 训练超参数。
+
+    这份配置与 locomotion（速度控制）非常相似，但有几个关键差异：
+
+    - **max_iterations=30000**：Mimic 通常更“像监督学习 + RL 微调”，收敛速度更快一些；
+    - **save_interval=500**：保存间隔更大，减少磁盘占用；
+    - **entropy_coef=0.005**：探索熵更小，鼓励更稳定地跟踪参考动作（减少随机性）。
+
+    读代码时建议你先抓住三个核心量：
+
+    - **num_steps_per_env**：每次 rollout 每个环境采样多少步
+    - **policy 网络结构**：Actor/Critic 的 MLP 隐层维度
+    - **algorithm**：PPO 的 clip、学习率、mini-batch、GAE 等
+    """
+
     num_steps_per_env = 24
     max_iterations = 30000
     save_interval = 500

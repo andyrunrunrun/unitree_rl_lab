@@ -25,6 +25,17 @@ import unitree_rl_lab.tasks.mimic.mdp as mdp
 from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_ACTION_SCALE
 from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_CFG as ROBOT_CFG
 
+"""G1 29DOF Mimic（动作模仿/动作跟踪）环境配置：Gangnam Style。
+
+这份配置与 `dance_102/tracking_env_cfg.py` 基本同构（场景/命令/动作/观测/奖励/终止/事件），
+差别主要体现在：
+
+- 使用的参考动作文件不同（motion_file 指向 Gangnam 的 NPZ/CSV）
+- 可能会针对动作特性略微调整 reward/termination 的阈值与权重
+
+建议先通读 dance_102 的版本，理解整体数据流后，再看本文件的差异点会更高效。
+"""
+
 ##
 # Scene definition
 ##

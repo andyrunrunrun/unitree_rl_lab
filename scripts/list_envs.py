@@ -48,10 +48,10 @@ def _walk_packages(
                 else:
                     raise
             else:
-                path = getattr(sys.modules[info.name], "__path__", None) or []
+                path = getattr(sys.modules[info.name], "__path__", None) or []  # pyright: ignore[reportAssignmentType]
 
                 # don't traverse path items we've seen before
-                path = [p for p in path if not seen(p)]
+                path = [p for p in path if not seen(p)]  # pyright: ignore[reportAssignmentType, reportOptionalIterable]
 
                 yield from _walk_packages(path, info.name + ".", onerror)
 
